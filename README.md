@@ -1,6 +1,10 @@
 # momo_bill_payment_service
 Interview test of MOMO company: bill payent service
 
+## How to run
+javac BillPaymentService.java User.java Bill.java
+java BillPaymentService
+
 ## Classes
 1. User
 2. Bill
