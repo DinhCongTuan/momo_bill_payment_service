@@ -1,4 +1,4 @@
-package com.tuandc.momo;
+package com.tuandc.momo.model;
 
 public enum BillType {
 

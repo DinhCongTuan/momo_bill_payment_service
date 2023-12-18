@@ -1,11 +1,13 @@
-package com.tuandc.momo;
+package com.tuandc.momo.service;
+
+import com.tuandc.momo.model.User;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class PaymentService {
 
-    private List<User> users;
+    private final List<User> users;
 
     public PaymentService() {
         users = new ArrayList<>();

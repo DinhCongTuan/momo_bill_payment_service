@@ -1,4 +1,4 @@
-package com.tuandc.momo;
+package com.tuandc.momo.model;
 
 import java.time.LocalDate;
 
