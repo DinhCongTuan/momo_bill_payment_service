@@ -8,48 +8,24 @@ import java.util.Optional;
 
 public class UserService {
 
-    private final List<User> users;
+    private final User user;
 
     public UserService() {
-        users = new ArrayList<>();
+        user = new User();
+        user.setUserId(1);
+        user.setUserName("default user name");
     }
 
-    public void createUser(String userName) {
-        for (User user : users) {
-            if (userName.equalsIgnoreCase(user.getUserName())) {
-                System.out.println("Username already exists");
-                return;
-            }
-        }
-
-        User user = new User();
-        user.setUserId(users.size() + 1);
-        user.setUserName(userName);
-        users.add(user);
-        displayUser(user);
+    public User getUser() {
+        return user;
     }
 
-    public void addFunds(int userId, int amount) {
-        Optional<User> optional = this.users.stream()
-                .filter(user -> user.getUserId() == userId)
-                .findFirst();
-        if (optional.isEmpty()) {
-            System.out.println("UserId is not exist");
-            return;
-        }
-
-        User user  = optional.get();
-        user.setAvailableBalance(user.getAvailableBalance() + amount);
-        displayAll();
-    }
-    private void displayAll() {
-        for (User user : users) {
-            displayUser(user);
-            System.out.println(" ----- ");
-        }
+    public void addFunds(int amount) {
+        this.user.setAvailableBalance(user.getAvailableBalance() + amount);
+        displayUser();
     }
 
-    private void displayUser(User user) {
+    private void displayUser() {
         System.out.println("UserID: " + user.getUserId());
         System.out.println("Username: " + user.getUserName());
         System.out.println("BalanceAmount: " + user.getAvailableBalance());

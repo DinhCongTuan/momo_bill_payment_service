@@ -3,11 +3,12 @@ package com.tuandc.momo.model;
 import java.time.LocalDate;
 
 public class PaymentTransaction {
-    private int billId;
     private int transactionId;
+    private int billId;
+
     private int amount;
     private LocalDate paymentDate;
-    private String state;
+    private TransactionStatus state;
 
     public int getBillId() {
         return billId;
@@ -41,11 +42,11 @@ public class PaymentTransaction {
         this.paymentDate = paymentDate;
     }
 
-    public String getState() {
+    public TransactionStatus getState() {
         return state;
     }
 
-    public void setState(String state) {
+    public void setState(TransactionStatus state) {
         this.state = state;
     }
 }

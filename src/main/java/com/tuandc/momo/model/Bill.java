@@ -8,8 +8,31 @@ public class Bill {
     private BillType type;
     private int amount;
     private LocalDate dueDate;
-    private String state;
+    private BillStatus state;
     private Provider provider;
+
+    public Bill(int id, BillType type, int amount,
+                LocalDate dueDate, BillStatus state,
+                Provider provider) {
+        this.billId = id;
+        this.type = type;
+        this.amount = amount;
+        this.dueDate = dueDate;
+        this.state = state;
+        this.provider = provider;
+    }
+
+    @Override
+    public String toString() {
+        return "Bill{" +
+                "billId=" + billId +
+                ", type=" + type +
+                ", amount=" + amount +
+                ", dueDate=" + dueDate +
+                ", state=" + state +
+                ", provider=" + provider +
+                '}';
+    }
 
     public int getBillId() {
         return billId;
@@ -43,11 +66,11 @@ public class Bill {
         this.dueDate = dueDate;
     }
 
-    public String getState() {
+    public BillStatus getState() {
         return state;
     }
 
-    public void setState(String state) {
+    public void setState(BillStatus state) {
         this.state = state;
     }
 

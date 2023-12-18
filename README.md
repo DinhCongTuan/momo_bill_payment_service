@@ -2,8 +2,9 @@
 Interview test of MOMO company: bill payent service
 
 ## How to run
-javac BillPaymentService.java User.java Bill.java
-java BillPaymentService
+> javac src/main/java/com/tuandc/momo/**/*.java
+
+> java -classpath src/main/java com.tuandc.momo.BillPaymentService
 
 ## Classes
 1. User
@@ -15,5 +16,12 @@ java BillPaymentService
 
 ## Implementation step
 1. Start program with command input
-2. Create User, Bill, PaymentTransaction classes
-3. Create PaymentService
+2. Create User, Bill, PaymentTransaction model classes
+3. Create Service classes
+- create user
+- add funds
+4. Create Bill service
+- createBill()
+- updateBill(int billId)
+- searchBillByProvider(String provider)
+5. 

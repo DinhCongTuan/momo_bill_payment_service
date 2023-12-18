@@ -9,10 +9,14 @@ public class User {
     private String userName;
 
     private int availableBalance;
-    private List<Bill> bills;
-    private List<PaymentTransaction> paymentTransactions;
 
     public User() {
+    }
+
+    public User(int userId, String userName, int availableBalance) {
+        this.userId = userId;
+        this.userName = userName;
+        this.availableBalance = availableBalance;
     }
 
     public String getUserName() {
@@ -37,21 +41,5 @@ public class User {
 
     public void setAvailableBalance(int availableBalance) {
         this.availableBalance = availableBalance;
-    }
-
-    public List<Bill> getBills() {
-        return bills;
-    }
-
-    public void setBills(List<Bill> bills) {
-        this.bills = bills;
-    }
-
-    public List<PaymentTransaction> getPaymentTransactions() {
-        return paymentTransactions;
-    }
-
-    public void setPaymentTransactions(List<PaymentTransaction> paymentTransactions) {
-        this.paymentTransactions = paymentTransactions;
     }
 }

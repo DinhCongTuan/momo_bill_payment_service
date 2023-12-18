@@ -1,9 +1,17 @@
 package com.tuandc.momo;
 
+import com.tuandc.momo.model.Bill;
+import com.tuandc.momo.model.BillType;
 import com.tuandc.momo.model.Command;
+import com.tuandc.momo.model.Provider;
+import com.tuandc.momo.service.BillService;
 import com.tuandc.momo.service.PaymentService;
 import com.tuandc.momo.service.UserService;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 
 public class BillPaymentService {
@@ -12,6 +20,8 @@ public class BillPaymentService {
 
 //        PaymentService paymentService = new PaymentService();
         UserService userService = new UserService();
+        BillService billService = new BillService();
+        PaymentService paymentService = new PaymentService();
         Scanner scanner = new Scanner(System.in);
         int operationCount = 1;
         boolean isProceed = true;
@@ -27,7 +37,6 @@ public class BillPaymentService {
                 System.out.println("Invalid command.");
                 continue;
             }
-
             String commandStr = tokens[0];
             Command command;
             try {
@@ -36,33 +45,68 @@ public class BillPaymentService {
                 System.out.println("String does not match any Enum constant: " + e.getMessage());
                 continue;
             }
-
-            switch (command) {
-                case CREATE_USER: // CREATE_USER UserName
-                    if (tokens.length < 2) {
-                        System.out.println("Invalid parameters for CREATE_USER command.");
-                        break;
-                    }
-                    userService.createUser(tokens[1]);
-                    break;
-                case CASH_IN: // CASH_IN UerId Amount
-                    try {
-                        int userId = Integer.parseInt(tokens[1]);
-                        int amount = Integer.parseInt(tokens[2]);
-                        userService.addFunds(userId, amount);
-                    } catch (NumberFormatException e) {
-                        System.out.println("Invalid userId/amount for CASH_IN command.");
-                    }
-
-                    break;
-                case EXIT:
-                    System.out.println("Exiting program.");
-                    System.exit(0);
-                    break;
-                default:
-                    System.out.println("Command not recognized.");
-                    break;
-            }
+            proceedCommand(command, tokens, userService, billService, paymentService);
         }
+    }
+
+    private static void proceedCommand(Command command, String[] tokens,
+                                       UserService userService,
+                                       BillService billService,
+                                       PaymentService paymentService) {
+        switch (command) {
+            case CASH_IN: // CASH_IN Amount
+                try {
+                    int amount = Integer.parseInt(tokens[1]);
+                    userService.addFunds(amount);
+                } catch (NumberFormatException e) {
+                    System.out.println("Invalid amount for CASH_IN command.");
+                }
+                break;
+
+            case CREATE_BILL: // CREATE_BILL BillType amount DueDate Provider
+                try {
+                    BillType billType = BillType.valueOf(tokens[1]);
+                    int amount = Integer.parseInt(tokens[2]);
+                    LocalDate dueDate = convertToLocalDate(tokens[3]);
+                    Provider provider = Provider.valueOf(tokens[4]);
+                    billService.createBill(billType, amount, dueDate, provider);
+                } catch (Exception e) {
+                    System.out.println("Invalid input");
+                }
+                break;
+
+            case LIST_BILL:
+                billService.displayListOfBills();
+                break;
+            case PAY: //PAY billId
+                int billId = Integer.parseInt(tokens[1]);
+                Bill bill = getBillById(billId, billService.getBills());
+                paymentService.pay(bill, userService.getUser());
+                break;
+            case EXIT:
+                System.out.println("Exiting program.");
+                System.exit(0);
+                break;
+            default:
+                System.out.println("Command not recognized.");
+                break;
+        }
+    }
+
+    private static Bill getBillById(int billId, List<Bill> billList) {
+        Optional<Bill> optional = billList.stream()
+                .filter(bill -> bill.getBillId() == billId)
+                .findFirst();
+        if (optional.isEmpty()) {
+            System.out.println("BillId not found");
+            return null;
+        }
+
+        return optional.get();
+    }
+    private static LocalDate convertToLocalDate(String dateString) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        return LocalDate.parse(dateString, formatter);
     }
 }
