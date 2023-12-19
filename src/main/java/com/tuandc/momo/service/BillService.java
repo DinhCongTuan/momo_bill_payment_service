@@ -8,6 +8,7 @@ import com.tuandc.momo.model.Provider;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class BillService {
 
@@ -31,6 +32,17 @@ public class BillService {
 
     public List<Bill> getBills() {
         return bills;
+    }
+
+    public Bill getBillById(int billId) {
+        Optional<Bill> optional = bills.stream()
+                .filter(bill -> bill.getBillId() == billId)
+                .findFirst();
+        if (optional.isEmpty()) {
+            System.out.println("BillId not found");
+            return null;
+        }
+        return optional.get();
     }
 
     public void displayListOfBills() {

@@ -9,17 +9,22 @@ import com.tuandc.momo.service.PaymentService;
 import com.tuandc.momo.service.UserService;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class BillPaymentService {
     public static void main(String[] args) {
         System.out.println("Bill Payment Service Start ...");
-
-//        PaymentService paymentService = new PaymentService();
         UserService userService = new UserService();
         BillService billService = new BillService();
         PaymentService paymentService = new PaymentService();
+
+        triggerSchedule(userService, billService);
         Scanner scanner = new Scanner(System.in);
         int operationCount = 1;
         boolean isProceed = true;
@@ -77,6 +82,15 @@ public class BillPaymentService {
             case LIST_BILL:
                 billService.displayListOfBills();
                 break;
+            case SCHEDULE: //SCHEDULE 2 28/10/2020
+                try {
+                    int billId = Integer.parseInt(tokens[1]);
+                    LocalDate paymentDate = convertToLocalDate(tokens[2]);
+                    paymentService.schedulePayment(billId, paymentDate);
+                } catch (NumberFormatException e) {
+                    System.out.println("Invalid input");
+                }
+                break;
             case PAY: //PAY billId1 billId2
                 List<Bill> billsToPay = getBillsToPay(tokens, billService.getBills());
                 paymentService.payMultipleBills(userService.getUser(), billsToPay);
@@ -110,20 +124,36 @@ public class BillPaymentService {
                 .filter(bill -> billIDs.contains(bill.getBillId()))
                 .toList();
     }
-    private static Bill getBillById(int billId, List<Bill> billList) {
-        Optional<Bill> optional = billList.stream()
-                .filter(bill -> bill.getBillId() == billId)
-                .findFirst();
-        if (optional.isEmpty()) {
-            System.out.println("BillId not found");
-            return null;
-        }
 
-        return optional.get();
-    }
     private static LocalDate convertToLocalDate(String dateString) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
         return LocalDate.parse(dateString, formatter);
+    }
+
+    private static void triggerSchedule(UserService userService, BillService billService) {
+        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+        Runnable task = () -> {
+            PaymentService paymentService = new PaymentService();
+            paymentService.processScheduledPayments(userService.getUser(), billService);
+        };
+        long initialDelay = calculateInitialDelay();
+        scheduler.scheduleAtFixedRate(task, initialDelay, 24, TimeUnit.HOURS);
+    }
+    private static long calculateInitialDelay() {
+        LocalTime now = LocalTime.now();
+
+        // Calculate the initial delay until the next execution at, for example, 2 AM
+        LocalTime scheduledTime = LocalTime.of(2, 0); // Scheduled time (2 AM)
+
+        if (now.isAfter(scheduledTime)) {
+            // If the current time is after the scheduled time, add hours to reach the next day's scheduled time
+            long hoursUntilNextDay = 24 - now.until(scheduledTime, ChronoUnit.HOURS);
+            return hoursUntilNextDay;
+        } else {
+            // If the current time is before the scheduled time, calculate the delay until the scheduled time
+            long initialDelay = now.until(scheduledTime, ChronoUnit.HOURS);
+            return initialDelay;
+        }
     }
 }

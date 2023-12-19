@@ -66,7 +66,7 @@ class PaymentServiceTest {
 
     @Test
     void testPay_SuccessfulPayment() {
-        paymentService.pay(bill, user);
+        paymentService.pay(user, bill);
         List<PaymentTransaction> transactions = paymentService.getTransactions();
 
         assertEquals(1, transactions.size());
@@ -80,7 +80,7 @@ class PaymentServiceTest {
     @Test
     void testPay_InsufficientFunds() {
         user.setAvailableBalance(200);
-        paymentService.pay(bill, user);
+        paymentService.pay(user, bill);
         List<PaymentTransaction> transactions = paymentService.getTransactions();
 
         assertEquals(1, transactions.size());

@@ -7,7 +7,7 @@ public enum Command {
 
     CREATE_BILL,
     LIST_BILL,
-
+    SCHEDULE, // schedule payment date
     PAY, // user pays a bill
     LIST_PAYMENT,
     SEARCH_BILL_BY_PROVIDER,

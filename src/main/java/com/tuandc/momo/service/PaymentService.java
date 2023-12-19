@@ -4,7 +4,9 @@ import com.tuandc.momo.model.*;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class PaymentService {
 
@@ -16,6 +18,29 @@ public class PaymentService {
 
     public List<PaymentTransaction> getTransactions() {
         return transactions;
+    }
+
+    private final Map<Integer, LocalDate> scheduledPayments = new HashMap<>();
+
+    public void schedulePayment(int billId, LocalDate scheduledDate) {
+        scheduledPayments.put(billId, scheduledDate);
+        System.out.println("Payment for bill id " + billId + " is scheduled on " + scheduledDate);
+    }
+
+    public void processScheduledPayments(User user, BillService billService) {
+        LocalDate currentDate = LocalDate.now();
+        for (Map.Entry<Integer, LocalDate> entry : scheduledPayments.entrySet()) {
+            int billId = entry.getKey();
+            LocalDate scheduledDate = entry.getValue();
+
+            if (currentDate.equals(scheduledDate)) {
+                Bill scheduledBill = billService.getBillById(billId);
+                if (scheduledBill != null && scheduledBill.getState() != BillStatus.PAID) {
+                    pay(user, scheduledBill);
+                }
+                scheduledPayments.remove(billId);
+            }
+        }
     }
 
     public void payMultipleBills(User user, List<Bill> billsToPay) {
@@ -49,7 +74,7 @@ public class PaymentService {
         System.out.println("Your current balance is:" + user.getAvailableBalance());
     }
 
-    public void pay(Bill bill, User user) {
+    public void pay(User user, Bill bill) {
         if (bill == null) return;
         PaymentTransaction transaction = new PaymentTransaction();
         transaction.setTransactionId(this.transactions.size() + 1);
