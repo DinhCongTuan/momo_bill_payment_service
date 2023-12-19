@@ -23,11 +23,14 @@ public class PaymentService {
     private final Map<Integer, LocalDate> scheduledPayments = new HashMap<>();
 
     public void schedulePayment(int billId, LocalDate scheduledDate) {
+        // validate the scheduledDate
         scheduledPayments.put(billId, scheduledDate);
         System.out.println("Payment for bill id " + billId + " is scheduled on " + scheduledDate);
     }
 
     public void processScheduledPayments(User user, BillService billService) {
+        System.out.println("Triggered processScheduledPayments ...");
+        System.out.println(scheduledPayments.size());
         LocalDate currentDate = LocalDate.now();
         for (Map.Entry<Integer, LocalDate> entry : scheduledPayments.entrySet()) {
             int billId = entry.getKey();
@@ -57,6 +60,10 @@ public class PaymentService {
 
         for (Bill bill : billsToPay) {
             //validate status and due date of the Bill -> by pass
+            if (bill.getState() == BillStatus.PAID) {
+                System.out.println("Payment already completed for Bill with id: " + bill.getBillId());
+                continue;
+            }
             PaymentTransaction transaction = new PaymentTransaction();
             transaction.setTransactionId(this.transactions.size() + 1);
             transaction.setAmount(bill.getAmount());

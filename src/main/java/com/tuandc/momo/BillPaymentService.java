@@ -24,7 +24,15 @@ public class BillPaymentService {
         BillService billService = new BillService();
         PaymentService paymentService = new PaymentService();
 
-        triggerSchedule(userService, billService);
+        triggerSchedule(userService, billService, paymentService);
+        // Start a thread for handling user input
+        Thread userInputThread = new Thread(() -> handleUserInput(userService, billService, paymentService));
+        userInputThread.start();
+
+    }
+
+    private static void handleUserInput(UserService userService, BillService billService,
+                                        PaymentService paymentService) {
         Scanner scanner = new Scanner(System.in);
         int operationCount = 1;
         boolean isProceed = true;
@@ -65,7 +73,9 @@ public class BillPaymentService {
                     System.out.println("Invalid amount for CASH_IN command.");
                 }
                 break;
-
+            case SHOW_BALANCE:
+                userService.displayUser();
+                break;
             case CREATE_BILL: // CREATE_BILL BillType amount DueDate Provider
                                 // CREATE_BILL WATER 1000 20/12/2023 SAVACO_HCMC
                 try {
@@ -82,7 +92,7 @@ public class BillPaymentService {
             case LIST_BILL:
                 billService.displayListOfBills();
                 break;
-            case SCHEDULE: //SCHEDULE 2 28/10/2020
+            case SCHEDULE: //SCHEDULE 2 20/12/2023
                 try {
                     int billId = Integer.parseInt(tokens[1]);
                     LocalDate paymentDate = convertToLocalDate(tokens[2]);
@@ -131,29 +141,10 @@ public class BillPaymentService {
         return LocalDate.parse(dateString, formatter);
     }
 
-    private static void triggerSchedule(UserService userService, BillService billService) {
+    private static void triggerSchedule(UserService userService, BillService billService,
+                                        PaymentService paymentService) {
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-        Runnable task = () -> {
-            PaymentService paymentService = new PaymentService();
-            paymentService.processScheduledPayments(userService.getUser(), billService);
-        };
-        long initialDelay = calculateInitialDelay();
-        scheduler.scheduleAtFixedRate(task, initialDelay, 24, TimeUnit.HOURS);
-    }
-    private static long calculateInitialDelay() {
-        LocalTime now = LocalTime.now();
-
-        // Calculate the initial delay until the next execution at, for example, 2 AM
-        LocalTime scheduledTime = LocalTime.of(2, 0); // Scheduled time (2 AM)
-
-        if (now.isAfter(scheduledTime)) {
-            // If the current time is after the scheduled time, add hours to reach the next day's scheduled time
-            long hoursUntilNextDay = 24 - now.until(scheduledTime, ChronoUnit.HOURS);
-            return hoursUntilNextDay;
-        } else {
-            // If the current time is before the scheduled time, calculate the delay until the scheduled time
-            long initialDelay = now.until(scheduledTime, ChronoUnit.HOURS);
-            return initialDelay;
-        }
+        Runnable task = () -> paymentService.processScheduledPayments(userService.getUser(), billService);
+        scheduler.scheduleAtFixedRate(task, 0, 2, TimeUnit.MINUTES);
     }
 }

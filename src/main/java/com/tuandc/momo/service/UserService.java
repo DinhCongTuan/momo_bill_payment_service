@@ -25,7 +25,7 @@ public class UserService {
         displayUser();
     }
 
-    private void displayUser() {
+    public void displayUser() {
         System.out.println("UserID: " + user.getUserId());
         System.out.println("Username: " + user.getUserName());
         System.out.println("BalanceAmount: " + user.getAvailableBalance());
