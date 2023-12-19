@@ -18,6 +18,37 @@ public class PaymentService {
         return transactions;
     }
 
+    public void payMultipleBills(User user, List<Bill> billsToPay) {
+        int totalAmount = 0;
+        for (Bill bill : billsToPay) {
+            totalAmount += bill.getAmount();
+        }
+
+        int availableBalance = user.getAvailableBalance();
+        if (availableBalance < totalAmount) {
+            System.out.println("Sorry! Not enough fund to proceed with payment.");
+            return;
+        }
+
+        for (Bill bill : billsToPay) {
+            //validate status and due date of the Bill -> by pass
+            PaymentTransaction transaction = new PaymentTransaction();
+            transaction.setTransactionId(this.transactions.size() + 1);
+            transaction.setAmount(bill.getAmount());
+            transaction.setBillId(bill.getBillId());
+            transaction.setPaymentDate(LocalDate.now());
+
+            transaction.setState(TransactionStatus.SUCCEED);
+            this.transactions.add(transaction);
+
+            availableBalance -= bill.getAmount();
+            bill.setState(BillStatus.PAID);
+            System.out.println("Payment has been completed for Bill with id: " + bill.getBillId());
+        }
+        user.setAvailableBalance(availableBalance);
+        System.out.println("Your current balance is:" + user.getAvailableBalance());
+    }
+
     public void pay(Bill bill, User user) {
         if (bill == null) return;
         PaymentTransaction transaction = new PaymentTransaction();

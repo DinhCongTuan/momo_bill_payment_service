@@ -10,9 +10,7 @@ import com.tuandc.momo.service.UserService;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Optional;
-import java.util.Scanner;
+import java.util.*;
 
 public class BillPaymentService {
     public static void main(String[] args) {
@@ -64,6 +62,7 @@ public class BillPaymentService {
                 break;
 
             case CREATE_BILL: // CREATE_BILL BillType amount DueDate Provider
+                                // CREATE_BILL WATER 1000 20/12/2023 SAVACO_HCMC
                 try {
                     BillType billType = BillType.valueOf(tokens[1]);
                     int amount = Integer.parseInt(tokens[2]);
@@ -78,10 +77,12 @@ public class BillPaymentService {
             case LIST_BILL:
                 billService.displayListOfBills();
                 break;
-            case PAY: //PAY billId
-                int billId = Integer.parseInt(tokens[1]);
-                Bill bill = getBillById(billId, billService.getBills());
-                paymentService.pay(bill, userService.getUser());
+            case PAY: //PAY billId1 billId2
+                List<Bill> billsToPay = getBillsToPay(tokens, billService.getBills());
+                paymentService.payMultipleBills(userService.getUser(), billsToPay);
+                break;
+            case LIST_PAYMENT:
+                paymentService.displayListPayment();
                 break;
             case EXIT:
                 System.out.println("Exiting program.");
@@ -93,6 +94,22 @@ public class BillPaymentService {
         }
     }
 
+    private static List<Bill> getBillsToPay(String[] tokens, List<Bill> allBills) {
+        // Convert rest of the items to integers
+        Set<Integer> billIDs = new HashSet<>(tokens.length - 1);
+        for (int i = 1; i < tokens.length; i++) {
+            try {
+                billIDs.add(Integer.parseInt(tokens[i]));
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid integer found: " + tokens[i]);
+                return List.of();
+            }
+        }
+
+        return allBills.stream()
+                .filter(bill -> billIDs.contains(bill.getBillId()))
+                .toList();
+    }
     private static Bill getBillById(int billId, List<Bill> billList) {
         Optional<Bill> optional = billList.stream()
                 .filter(bill -> bill.getBillId() == billId)

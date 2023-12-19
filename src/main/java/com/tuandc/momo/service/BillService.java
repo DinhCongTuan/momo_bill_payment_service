@@ -25,6 +25,7 @@ public class BillService {
         BillStatus status = BillStatus.NOT_PAID;
         Bill bill = new Bill(id, type, amount, dueDate, status, provider);
         this.bills.add(bill);
+        System.out.println("Create Bill successfully");
         displayBill(bill);
     }
 
@@ -45,6 +46,6 @@ public class BillService {
     }
 
     private void displayBill(Bill bill) {
-        bill.toString();
+        System.out.println(bill.toString());
     }
 }
