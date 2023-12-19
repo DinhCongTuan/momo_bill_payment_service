@@ -9,9 +9,7 @@ import com.tuandc.momo.service.PaymentService;
 import com.tuandc.momo.service.UserService;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -24,7 +22,8 @@ public class BillPaymentService {
         BillService billService = new BillService();
         PaymentService paymentService = new PaymentService();
 
-        triggerSchedule(userService, billService, paymentService);
+        initPaymentSchedule(userService, billService, paymentService);
+        initCheckBillDueDateSchedule(billService);
         // Start a thread for handling user input
         Thread userInputThread = new Thread(() -> handleUserInput(userService, billService, paymentService));
         userInputThread.start();
@@ -73,7 +72,7 @@ public class BillPaymentService {
                     System.out.println("Invalid amount for CASH_IN command.");
                 }
                 break;
-            case SHOW_BALANCE:
+            case VIEW_BALANCE:
                 userService.displayUser();
                 break;
             case CREATE_BILL: // CREATE_BILL BillType amount DueDate Provider
@@ -141,10 +140,15 @@ public class BillPaymentService {
         return LocalDate.parse(dateString, formatter);
     }
 
-    private static void triggerSchedule(UserService userService, BillService billService,
-                                        PaymentService paymentService) {
+    private static void initPaymentSchedule(UserService userService, BillService billService,
+                                            PaymentService paymentService) {
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
         Runnable task = () -> paymentService.processScheduledPayments(userService.getUser(), billService);
         scheduler.scheduleAtFixedRate(task, 0, 2, TimeUnit.MINUTES);
+    }
+    private static void initCheckBillDueDateSchedule(BillService billService) {
+        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+        Runnable task = billService::checkDueDateOfBills;
+        scheduler.scheduleAtFixedRate(task, 0, 1, TimeUnit.MINUTES);
     }
 }

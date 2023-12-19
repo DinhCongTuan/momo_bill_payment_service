@@ -4,7 +4,7 @@ public enum Command {
 
     CASH_IN, // add amount for a user
     CREATE_USER, // create a user
-    SHOW_BALANCE,
+    VIEW_BALANCE,
 
     CREATE_BILL,
     LIST_BILL,

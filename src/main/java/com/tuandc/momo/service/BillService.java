@@ -45,6 +45,17 @@ public class BillService {
         return optional.get();
     }
 
+    public void checkDueDateOfBills() {
+        System.out.println("Triggered checkDueDateOfBills ...");
+        for (Bill bill : bills) {
+            if (BillStatus.NOT_PAID == bill.getState()
+                    && bill.getDueDate().isAfter(LocalDate.now())) {
+                bill.setState(BillStatus.OVERDUE);
+                System.out.println("The Bill is Over DueDate, billId: " + bill.getBillId());
+            }
+        }
+    }
+
     public void displayListOfBills() {
         System.out.println("Bill No.   Type   Amount     Due Date      State    PROVIDER");
         for (Bill bill : bills) {

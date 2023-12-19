@@ -6,12 +6,28 @@ Interview test of MOMO company: bill payent service
 
 > java -classpath src/main/java com.tuandc.momo.BillPaymentService
 
+## Commands set
+> CASH_IN 1000
+
+> VIEW_BALANCE
+
+> CREATE_BILL WATER 1000 20/12/2023 SAVACO_HCMC
+
+> LIST_BILL
+
+> SCHEDULE 2 19/12/2023
+
+> PAY 1 2
+
+> LIST_PAYMENT
+
+> EXIT
+
 ## Classes
 1. User
 2. Bill
 3. PaymentTransaction
-    4.
-4. PaymentService
+4. Services
 5. Main
 
 ## Implementation step
@@ -21,7 +37,13 @@ Interview test of MOMO company: bill payent service
 - create user
 - add funds
 4. Create Bill service
-- createBill()
-- updateBill(int billId)
-- searchBillByProvider(String provider)
-5. 
+- createBill
+- updateBill
+- list bills
+- searchBillByProvider
+5. PaymentTransaction
+- Pay
+- list payments
+6. schedule
+- pay bills
+- check due date of bills
